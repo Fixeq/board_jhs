@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.hyunseok.mapper.boardMapper">
+	
+
+	<insert id="insertBoard" parameterType="boardVO">
+		INSERT INTO tbl_board ( boardWriter ,boardTitle ,boardContents ,boardRegDate)		
+					   VALUES ( #{boardWriter}, #{boardTitle}, #{boardContents}, CURRENT_TIMESTAMP);
+	</insert>
+	
+	<update id="updateBoard" parameterType="BoardVO">
+		UPDATE tbl_board
+		   SET boardWriter 		= 	#{boardWriter}
+		   	  ,boardTitle 		= 	#{boardTitle} 
+		  	  ,boardContents	= 	#{boardContents}
+		  	  ,boardUpdateId 	= 	#{boardUpdateId}
+		  	  ,boardUpdate 		= 	CURRENT_TIMESTAMP
+		 WHERE boardSeq = #{boardSeq}
+	</update>
+
+	<update id="deleteBoardSeq" parameterType="boardVO">
+		UPDATE tbl_board
+			SET boardDelYN = 'Y'
+				,boardUpdateId = #{boardUpdateId}
+				,boardUpdate = CURRENT_TIMESTAMP
+			WHERE boardSeq = #{boardSeq};
+	</update>
+
+	<!-- 
+		검색 & 페이징 쿼리
+	 -->
+	<select id="selectBoardPagingSearch" parameterType="BoardVO" resultType="BoardVO">
+		SELECT a.boardSeq, a.boardTitle, a.boardContents, a.boardWriter, a.boardRegDate
+		      ,a.boardUpdateId, a.boardUpdate, a.boardCnt, a.boardDelYN
+		  FROM (SELECT *
+				  FROM tbl_board
+				 WHERE boardDelYN ='N') a
+		 <include refid="search"></include>
+		 ORDER BY boardSeq DESC 
+		 LIMIT #{pageStart}, #{pageSize}		
+	</select>
+	
+  	<!-- 
+  		검색 쿼리 조각
+  	 -->
+  	<sql id="search">
+  		<choose>
+  			<!-- 검색 옵션이 전체 검색일 경우 -->
+  			<when test="searchOption == 'all'">
+  				WHERE boardWriter LIKE CONCAT('%',#{keyword},'%')
+  				OR boardTitle	  LIKE CONCAT('%',#{keyword},'%')
+  				OR boardContents  LIKE CONCAT('%',#{keyword},'%')
+   			</when>
+  			<!-- 전체 검색이 아닐 경우 -->
+  			<otherwise>
+  				WHERE ${searchOption} LIKE CONCAT('%',#{keyword},'%')
+  			</otherwise>
+  		</choose>
+  	</sql>
+	  	
+	<!-- 
+		게시글 갯수 조회
+	 -->
+	<select id="selectBoardTotalCount" parameterType="BoardVO" resultType="int">
+		 SELECT COUNT(a.boardSeq)
+		  FROM (SELECT *
+				  FROM tbl_board
+				 WHERE boardDelYN ='N') a
+		 <include refid="search"></include>
+		 ORDER BY boardSeq DESC
+  	</select>
+  	 
+	<select id="selectBoardDetail" parameterType="boardVO" resultType="boardVO">
+		SELECT boardSeq, boardWriter ,boardTitle ,boardContents ,boardCnt
+				,boardRegDate, boardUpdateId, boardUpdate
+		  FROM tbl_board
+		 WHERE boardSeq = #{boardSeq}
+	</select>
+	
+</mapper>
+
+
