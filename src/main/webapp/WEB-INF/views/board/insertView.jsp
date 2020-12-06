@@ -17,7 +17,8 @@
 	
 		$(document).ready(function(){
 			$('#submitBtn').click(function(){
-				
+		        event.preventDefault();
+		        
 				var title = $.trim($('#txtBoardTitle').val());
 				$('#txtBoardTitle').val(title);
 				
@@ -51,13 +52,25 @@
 		}); 
 		
 		function insertBoard(){
+			
+	        var formData = new FormData(); 
+	        formData.append("BoardTitle", $('#txtBoardTitle').val()); 
+	        formData.append("boardWriter", $('#boardWriter').val()); 
+	        formData.append("BoardContents", $('#txtBoardContents').val()); 
+	        formData.append("uploadFile", $("input[name=uploadFile]")[0].files[0]);
+
 			$.ajax({
 			    type: 'POST',
 			    url:'/board/insertProc', 			//	request 보낼 서버의 경로
-    			data: $('#submitFrm').serialize(),
+	            processData: false,
+	            contentType: false,
+
+    			data: formData,
+    				//$('#submitFrm').serialize(),
+			
 			    success: function(data) {
 			    	var msg = data;
-			    	console.log(msg);
+			    	console.log("data : "+ msg);
 			    	
 			    	if(msg == 0){
 			    		alert('등록에 실패하였습니다.');
@@ -83,17 +96,29 @@
 	</div>
 	
 	<div>
-		<form id="submitFrm" action="/board/insertProc" method="post">
-			<label>제목</label>
-			<input type="text" name="boardTitle" id="txtBoardTitle" maxlength="50">
-			<br>
-			<label>작성자</label>
-			<input type="text" name="boardWriter" id="txtBoardWriter" maxlength="25">
-			<br>
-			<textarea rows="20" cols="100" id="txtBoardContents" name="boardContents" maxlength="600"></textarea>
+		<form id="submitFrm" action="/board/insertProc" method="post" enctype="multipart/form-data">
+		<table border="1" cellpadding="0" cellspacing="0">
+			<tr>
+				<td bgcolor="orange" witdh="70">제목</td>
+				<td align="left"><input type="text" name="boardTitle" id="txtBoardTitle"></td>
+			</tr>
+			<tr>
+				<td bgcolor="orange">작성자</td>
+				<td align="left"><input type="text" name="boardWriter" id="boardWriter" size="10"></td>
+			</tr>
+			<tr>
+				<td bgcolor="orange">내용</td>
+				<td align="left">
+				<textarea rows="10" cols="40" id="txtBoardContents" name="boardContents" maxlength="600"></textarea>
+			</tr>
+			<tr>
+				<td bgcolor="orange" width="70">업로드</td>
+				<td align="left"><input type="file" name="uploadFile" id="uploadFile"></td>
+			</tr>
+		</table>
+			<input type="submit" id="submitBtn" value="새글 등록">
+			<button id="listBtn">목록</button>
 		</form>
-		<button id="submitBtn">등록</button>
-		<button id="listBtn">목록</button>
 	</div>
 </body>
 </html>

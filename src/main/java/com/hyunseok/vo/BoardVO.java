@@ -2,6 +2,8 @@ package com.hyunseok.vo;
 
 import java.util.Date;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class BoardVO extends PageInfo{
 	
 	private Long	boardSeq        ;	/*게시글 번호*/
@@ -13,6 +15,7 @@ public class BoardVO extends PageInfo{
 	private Date	boardRegDate    ;	/*게시글 등록일*/
 	private String	boardUpdateId   ;	/*게시글 수정자*/
 	private Date	boardUpdate     ;	/*게시글 수정일*/
+	private MultipartFile uploadFile;	/*업로드 게시물*/
 	
 
 	
@@ -112,11 +115,23 @@ public class BoardVO extends PageInfo{
 
 
 
+	public MultipartFile getUploadFile() {
+		return uploadFile;
+	}
+
+
+
+	public void setUploadFile(MultipartFile uploadFile) {
+		this.uploadFile = uploadFile;
+	}
+
+
+
 	@Override
 	public String toString() {
 		return "BoardVO [boardSeq=" + boardSeq + ", boardWriter=" + boardWriter + ", boardTitle=" + boardTitle
 				+ ", boardContents=" + boardContents + ", boardCnt=" + boardCnt + ", boardRegDate=" + boardRegDate
-				+ ", boardUpdateId=" + boardUpdateId + ", boardUpdate=" + boardUpdate + " " + super.toString() +"]";
+				+ ", boardUpdateId=" + boardUpdateId + ", boardUpdate=" + boardUpdate + " " + "MultipartFile= " + uploadFile +" "+ super.toString() +"]";
 	}
 	
 }
