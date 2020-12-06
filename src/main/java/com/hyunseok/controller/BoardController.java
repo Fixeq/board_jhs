@@ -1,7 +1,10 @@
 package com.hyunseok.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.hyunseok.service.BoardService;
@@ -68,11 +72,26 @@ public class BoardController {
 	
 	@ResponseBody
 	@RequestMapping(value="/insertProc",method=RequestMethod.POST )
-	public int inserProc(BoardVO dto) {
+	public int inserProc(BoardVO dto) throws IOException{
 		
 		System.out.println("insert dto : " + dto);
-		
 		int result = 0;
+		
+		// 파일 업로드 처리
+		MultipartFile uploadFile = dto.getUploadFile();
+		String fileName = "";
+		try {
+			if(!uploadFile.isEmpty()) {
+				fileName = uploadFile.getOriginalFilename();
+				uploadFile.transferTo(new File("C:\\zzz\\upload\\" + fileName));
+				System.out.println("업로드 성공!");
+			}
+		}catch (Exception e) {
+			// result = -1 : 파일 업로드 중 장애발생
+			result = -2;
+			e.printStackTrace();
+		}
+		
 		try {
 			// result = 1 : 등록 성공, 0 : 등록 실패
 			result = service.insertBoard(dto);
